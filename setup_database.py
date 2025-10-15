@@ -7,10 +7,9 @@ def create_database():
     
     # Create database connection
     conn = sqlite3.connect('restaurant_data.db')
-    cursor = conn.cursor()
     
     # Create table
-    cursor.execute('''
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS restaurant_transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             restaurant_name TEXT NOT NULL,
@@ -33,18 +32,16 @@ def create_database():
     df.to_sql('restaurant_transactions', conn, if_exists='replace', index=False)
     
     # Create indexes for better query performance
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_restaurant ON restaurant_transactions(restaurant_name)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_food ON restaurant_transactions(food_name)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_customer ON restaurant_transactions(customer_name)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_restaurant ON restaurant_transactions(restaurant_name)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_food ON restaurant_transactions(food_name)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_customer ON restaurant_transactions(customer_name)')
     
     # Verify data
-    cursor.execute('SELECT COUNT(*) FROM restaurant_transactions')
-    count = cursor.fetchone()[0]
+    count = conn.execute('SELECT COUNT(*) FROM restaurant_transactions').fetchone()[0]
     print(f"Successfully inserted {count} records")
     
     # Show sample data
-    cursor.execute('SELECT * FROM restaurant_transactions LIMIT 5')
-    sample = cursor.fetchall()
+    sample = conn.execute('SELECT * FROM restaurant_transactions LIMIT 5').fetchall()
     print("Sample data:")
     for row in sample:
         print(row)
